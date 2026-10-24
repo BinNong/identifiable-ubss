@@ -1,0 +1,54 @@
+{
+  "working_title": "Joint identifiability of underdetermined post-nonlinear mixtures across regimes: Support coverage and intersection lattices",
+  "observation_model": "x_t = f_{r_t}(A s_t) + epsilon_t",
+  "dimensions": {
+    "observations_m": "m",
+    "sources_n": "n",
+    "constraint": "n > m"
+  },
+  "known_information": [
+    "regime label r_t",
+    "source count n and sparsity level k",
+    "analysis-window length",
+    "componentwise real-analytic strict monotonicity and zero-preservation of each f_r",
+    "an input-scale-normalized function class for every regime",
+    "observation-domain calibration uniqueness for the population lifting theorem",
+    "parametric PNL family and frozen estimator thresholds in finite-sample experiments"
+  ],
+  "unknown_information": [
+    "shared full-spark mixing matrix A",
+    "regime-specific componentwise nonlinearities f_r",
+    "source signals, sparse supports and isolated-zone labels"
+  ],
+  "scale_normalization": "If f and f(D^{-1}z) both belong to the selected class, then D=I. The experimental family f(z)=z+beta*tanh(z), beta>-1, satisfies this condition by its unit asymptotic slope. This removes diagonal scale only, not general nonlinear reparameterization.",
+  "calibration_uniqueness": "Every observationally equivalent representation in the model class must have the same linearized variable up to a diagonal sensor scale and global source permutation-column scaling. Real analyticity and nonempty open observation intervals extend the scale relation so normalization forces D_r=I. This is an independent population assumption, not a conclusion from rich isolated zones.",
+  "calibration_counterexample": "For A=[I_4, ones], H(z)=z+z^3 preserves the separating support subspaces. The alternative g=f(H^{-1}z) remains in the general normalized analytic class but gives nonlinearly reparameterized sources. Therefore normalization and support geometry alone do not prove calibration uniqueness.",
+  "unnormalized_ambiguity": "For any positive diagonal D, (A,f_r) and (DA,f_r(D^{-1}z)) induce identical noiseless observations with unchanged sources and supports but generically different column directions.",
+  "cross_regime_coupling": "A is shared across regimes, and calibration uniqueness plus normalized analytic continuation forces every residual regime-specific row scale D_r to be I before support subspaces are pooled",
+  "source_assumption": "k-sparse sources with connected relatively open support domains and regime-specific, potentially incomplete support coverage",
+  "global_coverage_requirement": "For each source i, the intersection of all supports containing i is {i}; the unlabelled depth-k intersection lattice recovers exactly the identifiable column directions",
+  "source_recovery_requirement": "After A is identified, the sparse representation is unique under 2k < spark(A)",
+  "stability_result": "A local deterministic bound for one approximate intersection; no recursive depth-k propagation or end-to-end statistical rate is claimed",
+  "negative_control_model": "x_t = f_{r_t}(A_{r_t}s_t) with arbitrary unrelated A_r and no cross-regime constraint; increasing R alone does not remove per-regime ambiguity",
+  "equivalence_class": "A global permutation and nonsingular diagonal scaling of source columns, with corresponding inverse scalings of sources; f_r is identified on its observation domain only under calibration uniqueness",
+  "experiment_evidence_scope": {
+    "five_source": "End-to-end blind PNL calibration, depth-2 direction recovery and noise-aware sparse recovery; oracle inversion is only a control; PNL-SCA-SSZ and online dictionary learning are explicitly adapted baselines",
+    "random_support": "Random separating support families with the same normalized calibrator and both baselines; not evidence restricted to the original {1,5}/{2,5} configuration",
+    "higher_order": "Linear support-subspace geometry showing depth-3 recovery versus pairwise failure; no PNL calibration claim",
+    "scaling": "Noiseless linear direction estimation and OMP source recovery; not a scalable high-dimensional PNL claim",
+    "lattice_complexity": "Noiseless population subspaces varying k and multi-source prototype count; no PNL calibration, source recovery or pruning claim",
+    "conditioning": "Different accepted matrix ensembles with angle quartiles and post-hoc operational failure attribution; not a same-matrix dose response",
+    "measured_speech": "Measured source waveforms with synthetic activation blocks, shared mixing and regime-specific PNL distortions; not real-mixture validation"
+  },
+  "out_of_scope": [
+    "a merely C1 generalization or calibration uniqueness derived from rich isolated zones alone",
+    "arbitrary continuous mixing trajectories",
+    "unknown regime labels",
+    "unknown source count or sparsity level",
+    "general dependent non-sparse sources",
+    "unnormalized physical mixing-direction claims without external sensor calibration",
+    "higher-sparsity or non-full-spark guarantees beyond 2k < spark(A)",
+    "recursive depth-k stability or statistical consistency rates combining calibration and intersection errors",
+    "claims of real-world recovery without independently recorded PNL mixtures and source-level ground truth"
+  ]
+}

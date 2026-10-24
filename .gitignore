@@ -1,0 +1,17 @@
+# Track only source files and minimal reproducibility documentation.
+/*
+!/.gitignore
+!/README.md
+!/requirements.txt
+!/src/
+!/experiments/
+!/data/
+
+/data/*
+!/data/README.md
+
+__pycache__/
+*.py[cod]
+.DS_Store
+.env
+.env.*
