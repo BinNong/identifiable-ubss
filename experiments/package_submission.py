@@ -12,6 +12,15 @@ def digest(path):
     return hasher.hexdigest()
 
 
+EXCLUDE_FROM_ARCHIVE = {
+    # Editorial correspondence and internal to-do lists are not part of the
+    # public reproducibility package.
+    "paper/cover_letter.pdf",
+    "paper/cover_letter.tex",
+    "paper/submission_checklist.txt",
+}
+
+
 def selected_files(project):
     files = [project / "README.md", project / "requirements.txt"]
     files.extend(sorted((project / "src").glob("*.py")))
@@ -22,8 +31,11 @@ def selected_files(project):
     files.extend(sorted((project / "data").glob("*.wav")))
     files.append(project / "data" / "README.md")
     results = project / "results"
-    for name in ["environment.json", "validation.json", "theory_verification.json", "run_all_full.log"]:
+    for name in ["environment_smoke.json", "validation.json", "theory_verification.json"]:
         files.append(results / name)
+    full_environment = results / "environment_full.json"
+    if full_environment.is_file():
+        files.append(full_environment)
     for base in ["coverage", "random_support", "higher_order", "higher_order_pnl", "scaling", "lattice_complexity", "pnl", "semisynthetic", "conditioning"]:
         for suffix in ["runs", "summary", "config"]:
             files.append(results / f"{base}_{suffix}.json")
@@ -36,7 +48,11 @@ def selected_files(project):
     files.append(results / "recovery_intervals.json")
     for pattern in ["*.pdf", "*.png"]:
         files.extend(sorted((results / "figures").glob(pattern)))
-    return sorted(set(files))
+    return sorted(
+        path
+        for path in set(files)
+        if str(path.relative_to(project)) not in EXCLUDE_FROM_ARCHIVE
+    )
 
 
 def main():

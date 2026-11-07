@@ -66,8 +66,9 @@ def main():
         "cuda_available": torch.cuda.is_available() if torch is not None else False,
         "commands": [f"python experiments/run_all.py --{mode} --workers {args.workers}"],
     }
-    with (project / "results" / "environment.json").open("w") as handle:
-        json.dump(environment, handle, indent=2)
+    for name in ["environment.json", f"environment_{mode}.json"]:
+        with (project / "results" / name).open("w") as handle:
+            json.dump(environment, handle, indent=2)
     print(json.dumps(environment, indent=2))
 
 

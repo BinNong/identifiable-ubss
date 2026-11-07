@@ -310,6 +310,64 @@ def check_selection_rule_saturation(rng):
     }
 
 
+def check_perturbed_lattice_spectral_margins():
+    from itertools import combinations
+
+    from subspace import _intersection_step
+
+    threshold = 0.995
+
+    def evaluate(matrix, left_indices, right_indices):
+        left = matrix[:, left_indices]
+        right = matrix[:, right_indices]
+        singular_values = np.linalg.svd(left.T @ right, compute_uv=False)
+        candidate, retained, _ = _intersection_step(left, right, threshold)
+        exact = intersect_subspaces(left, right)
+        minors = [
+            abs(np.linalg.det(matrix[:, list(indices)]))
+            for indices in combinations(range(matrix.shape[1]), matrix.shape[0])
+        ]
+        return {
+            "full_spark": bool(is_full_spark(matrix)),
+            "minimum_absolute_minor": float(min(minors)),
+            "singular_values": singular_values.tolist(),
+            "exact_intersection_rank": int(exact.shape[1]),
+            "retained_singular_values": retained.tolist(),
+            "output_rank": int(candidate.shape[1]),
+            "target_cosine": float(abs(candidate[:, 0] @ matrix[:, 0])) if candidate.shape[1] == 1 else None,
+        }
+
+    records = {}
+    for label, gamma in [("without_second_mode_margin", 0.01), ("with_second_mode_margin", 0.2)]:
+        matrix = np.column_stack([
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [0.0, np.sqrt(1.0 - gamma**2), gamma, 0.0],
+            [0.0, 0.0, 0.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0],
+        ])
+        record = evaluate(matrix, [0, 1], [0, 2])
+        record["gamma"] = gamma
+        record["zeta"] = float(np.sqrt(1.0 - gamma**2))
+        record["residual_condition"] = bool(0.0 < np.sqrt(1.0 - threshold**2))
+        record["second_mode_condition"] = bool(record["zeta"] < threshold)
+        records[label] = record
+
+    for label, theta in [("without_zero_intersection_exclusion", 0.05), ("with_zero_intersection_exclusion", 0.2)]:
+        matrix = np.column_stack([
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [np.cos(theta), 0.0, np.sin(theta), 0.0],
+            [0.0, 0.0, 0.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0],
+        ])
+        record = evaluate(matrix, [0, 1], [2, 3])
+        record["theta"] = theta
+        record["zero_intersection_condition"] = bool(record["singular_values"][0] <= threshold)
+        records[label] = record
+    return records
+
+
 def check_support_selection_false_alarm(rng, n_trials=2000):
     """Empirical error rate of the chi-squared support-selection rule.
 
@@ -407,6 +465,7 @@ def main():
     output["direction_selection_invariance"] = check_direction_selection_invariance()
     output["selection_rule_saturation"] = check_selection_rule_saturation(rng)
     output["support_selection_false_alarm"] = check_support_selection_false_alarm(rng)
+    output["perturbed_lattice_spectral_margins"] = check_perturbed_lattice_spectral_margins()
 
     matrix_multi = generate_full_spark(6, 7, rng)
     multi_supports = normalize_supports([
@@ -538,6 +597,24 @@ def main():
     false_alarm = output["support_selection_false_alarm"]
     assert 0.0 <= false_alarm["linear_support_error_rate"] <= 0.2
     assert 0.0 <= false_alarm["pnl_support_error_rate"] <= 0.2
+    spectral = output["perturbed_lattice_spectral_margins"]
+    completeness = spectral["without_second_mode_margin"]
+    completeness_control = spectral["with_second_mode_margin"]
+    assert completeness["full_spark"] and completeness_control["full_spark"]
+    assert completeness["exact_intersection_rank"] == 1
+    assert completeness["residual_condition"] and not completeness["second_mode_condition"]
+    assert completeness["output_rank"] == 2
+    assert completeness_control["second_mode_condition"]
+    assert completeness_control["output_rank"] == 1
+    assert completeness_control["target_cosine"] > 1.0 - 1e-12
+    zero_intersection = spectral["without_zero_intersection_exclusion"]
+    zero_intersection_control = spectral["with_zero_intersection_exclusion"]
+    assert zero_intersection["full_spark"] and zero_intersection_control["full_spark"]
+    assert zero_intersection["exact_intersection_rank"] == 0
+    assert not zero_intersection["zero_intersection_condition"]
+    assert zero_intersection["output_rank"] == 1
+    assert zero_intersection_control["zero_intersection_condition"]
+    assert zero_intersection_control["output_rank"] == 0
     selection = output["direction_selection_invariance"]
     assert selection["max_score_absolute_error"] < 1e-12
     assert selection["selected_direction_cosine"] > 1.0 - 1e-12

@@ -36,7 +36,7 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
 
 The pipeline runs on CPU and performs the following steps:
 
-1. verifies scale and calibration counterexamples, support-coverage constructions, direction-score redundancy invariance and the local stability bound;
+1. verifies scale and calibration counterexamples, support-coverage constructions, direction-score redundancy invariance, the local stability bound and the spectral conditions of the perturbed-lattice certificate;
 2. runs the direction-score ablation and all requested confirmation-seed experiments, random support families, and both adapted baselines;
 3. regenerates every figure, LaTeX result table and numerical macro from saved JSON;
 4. validates record counts, confirmation seeds, finite values, theory checks and paired failure-accounting consistency.
@@ -47,7 +47,7 @@ The development-only direction-score ablation uses previously inspected seeds an
 python experiments/run_selection_ablation.py --mode development --workers 6
 ```
 
-Generated JSON and figures are written to `results/`. Numerical LaTeX tables are generated locally under `paper/`; no manuscript is tracked. `experiments/package_submission.py` additionally requires the local manuscript and full results and does not publish them.
+Generated JSON and figures are written to `results/`. Each pipeline invocation writes `environment.json` for the latest run and a mode-specific `environment_smoke.json` or `environment_full.json`. Numerical LaTeX tables are generated locally under `paper/`; no manuscript is tracked. `experiments/package_submission.py` additionally requires the local manuscript and full results and does not publish them.
 
 ## Files
 

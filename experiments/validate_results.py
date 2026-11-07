@@ -122,6 +122,29 @@ def main():
     check("calibration_counterexample_identity", counterexample["max_observation_identity_error"] < 1e-8, counterexample)
     check("calibration_counterexample_nonlinear_sources", counterexample["max_source_formula_error"] < 1e-8 and counterexample["max_nonlinear_source_change"] > 1e-3)
     check("noise_scale_invariance", theory["noise_scale_invariance"]["max_relative_error"] < 1e-12, theory["noise_scale_invariance"])
+    spectral = theory["perturbed_lattice_spectral_margins"]
+    completeness = spectral["without_second_mode_margin"]
+    completeness_control = spectral["with_second_mode_margin"]
+    check("perturbed_lattice_completeness_margin", (
+        completeness["full_spark"]
+        and completeness["exact_intersection_rank"] == 1
+        and completeness["residual_condition"]
+        and not completeness["second_mode_condition"]
+        and completeness["output_rank"] == 2
+        and completeness_control["second_mode_condition"]
+        and completeness_control["output_rank"] == 1
+        and completeness_control["target_cosine"] > 1.0 - 1e-12
+    ), spectral)
+    zero_intersection = spectral["without_zero_intersection_exclusion"]
+    zero_intersection_control = spectral["with_zero_intersection_exclusion"]
+    check("perturbed_lattice_zero_intersection_exclusion", (
+        zero_intersection["full_spark"]
+        and zero_intersection["exact_intersection_rank"] == 0
+        and not zero_intersection["zero_intersection_condition"]
+        and zero_intersection["output_rank"] == 1
+        and zero_intersection_control["zero_intersection_condition"]
+        and zero_intersection_control["output_rank"] == 0
+    ), spectral)
     selection = theory["direction_selection_invariance"]
     check(
         "direction_selection_redundancy_invariance",

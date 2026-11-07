@@ -804,7 +804,7 @@ def write_supplement_tables(coverage, higher, pnl, semi, scaling, conditioning, 
         lines.extend([
             "\\begin{table}[htbp]",
             "\\centering\\small",
-            "\\caption{Computable validity indicator: surviving direction-cluster count versus fifth-source recovery (joint blind lattice, random support families). Counts above $n$ indicate elevated selection risk rather than certain failure; the conditional certificate requires exactly $n$ clusters, no upper-mode pair and the error margins of Proposition~\\ref{prop:perturbed_lattice}(v).}",
+            "\\caption{Computable validity indicator: surviving direction-cluster count versus fifth-source recovery (joint blind lattice, random support families). Counts above $n$ indicate elevated selection risk rather than certain failure; the conditional certificate additionally requires the retention, zero-intersection and clustering margins of Proposition~\\ref{prop:perturbed_lattice}(v).}",
             "\\label{tab:supp_cluster_count_rule}",
             "\\begin{tabular}{cccc}",
             "\\toprule",
