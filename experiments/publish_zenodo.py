@@ -175,14 +175,16 @@ def api_request(method, url, token, payload=None, raw=None, content_type="applic
 
 def doi_sentence(doi):
     return (
-        f"A frozen, citable copy of the full reproduction package is deposited at "
-        f"\\href{{https://doi.org/{doi}}}{{doi:{doi}}} (Zenodo, version 1.0)."
+        f"The full reproduction package is deposited at "
+        f"\\href{{https://doi.org/{doi}}}{{doi:{doi}}} (Zenodo)."
     )
 
 
+# Accepts both the current wording and the earlier "(Zenodo, version 1.0)" form,
+# so backfilling an existing manuscript stays idempotent.
 EXISTING_DOI_RE = re.compile(
-    r"A frozen, citable copy of the full reproduction package is deposited at "
-    r"\\href\{https://doi\.org/[^}]+\}\{doi:[^}]+\} \(Zenodo, version 1\.0\)\."
+    r"(?:A frozen, citable copy of the|The) full reproduction package is deposited at "
+    r"\\href\{https://doi\.org/[^}]+\}\{doi:[^}]+\} \(Zenodo[^)]*\)\."
 )
 
 
